@@ -89,10 +89,18 @@ int uartWrite(const char *str) {
 	return(i); // Bytes sent
 }
 
+#if defined(__SDCC) && __SDCC_REVISION < 9624 // Old SDCC weirdness
 void putchar(unsigned char data) {
     USART1_DR = data;
     while (!(USART1_SR & USART_SR_TC));
 }
+#else
+int putchar(int data) {
+    USART1_DR = data;
+    while (!(USART1_SR & USART_SR_TC));
+    return data;
+}
+#endif
 
 char uartRead() {
     if(USART1_SR & USART_SR_RXNE) {
